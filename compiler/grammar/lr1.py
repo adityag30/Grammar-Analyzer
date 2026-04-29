@@ -15,27 +15,7 @@ def augment_grammar(grammar):
     return new_grammar, new_start
 
 
-def first_of_string(symbols, first, grammar):
-    """
-    Computes FIRST of a string of symbols.
-    Used for lookahead computation in closure.
-    """
-    result = set()
-
-    for sym in symbols:
-        if sym not in grammar:
-            # Terminal
-            result.add(sym)
-            return result
-
-        result |= (first[sym] - {'ε'})
-
-        if 'ε' not in first[sym]:
-            return result
-
-    # All symbols derived ε
-    result.add('ε')
-    return result
+from grammar.first_follow import first_of_string
 
 
 def closure(items, grammar, first):

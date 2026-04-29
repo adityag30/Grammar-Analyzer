@@ -1,4 +1,5 @@
 import re
+import warnings
 
 TOKEN_RE = re.compile(r"\s*(?:(\d+(?:\.\d+)?)|([A-Za-z_]\w*)|(.))")
 
@@ -64,7 +65,7 @@ def repair_input_string(input_string):
         else:
             corrected.append((ttype, value))
 
-    return ''.join(value for _, value in corrected)
+    return ' '.join(value for _, value in corrected)
 
 
 # ============================================================
@@ -100,6 +101,9 @@ def generate_grammar(input_string):
         grammar['S'] = [['id', '=', 'E'], ['E']]
         warnings.append("✔ Assignment pattern detected. Added S → id = E | E")
 
+    unary_ops = detect_unary(input_string)
+    grammar = add_unary_support(grammar, unary_ops, warnings)
+    
     return {
         "grammar": grammar,
         "warnings": warnings
