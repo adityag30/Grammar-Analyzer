@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GrammarForge — Parser Generator</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- ── HEADER ─────────────────────────────────────────── -->
+    <header>
+        <h1><span>{</span> GrammarForge <span>}</span></h1>
+        <p>Input a string — get a grammar — parse it</p>
+    </header>
+
+    <!-- ── MAIN ───────────────────────────────────────────── -->
+    <main class="container">
+
+        <!-- INPUT SECTION -->
+        <section class="card input-card" id="section-input">
+            <div class="card-label">01 — INPUT</div>
+            <h2 class="card-title">Enter Your Expression</h2>
+            <p class="card-desc">
+                Type any arithmetic or assignment expression. The system will
+                automatically generate a grammar and build both LL(1) and LR(1) parsers.
+            </p>
+
+            <div class="input-row">
+                <div class="input-wrapper">
+                    <input type="text" id="input-string" placeholder="e.g.  a + b * c  or  x = a - b" autocomplete="off"
+                        spellcheck="false" />
+                    <span class="input-cursor"></span>
+                </div>
+                <button class="btn-primary" id="btn-run">
+                    <span>Analyze</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- WARNINGS BOX -->
+            <div class="warnings-box hidden" id="warnings-box">
+                <div class="warnings-title">⚡ Pipeline Log</div>
+                <ul id="warnings-list"></ul>
+            </div>
+        </section>
+
+        <!-- GRAMMAR SECTION -->
+        <section class="card hidden" id="section-grammar">
+            <div class="card-label">02 — GRAMMAR</div>
+            <h2 class="card-title">Generated Grammar</h2>
+            <div class="two-col">
+                <div>
+                    <div class="sub-label">Original (may have left recursion)</div>
+                    <pre class="code-block" id="grammar-original"></pre>
+                </div>
+                <div>
+                    <div class="sub-label">Final (LL(1)-ready)</div>
+                    <pre class="code-block highlight" id="grammar-final"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- FIRST & FOLLOW -->
+        <section class="card hidden" id="section-sets">
+            <div class="card-label">03 — SETS</div>
+            <h2 class="card-title">FIRST &amp; FOLLOW Sets</h2>
+            <div class="two-col">
+                <div>
+                    <div class="sub-label">FIRST Sets</div>
+                    <table class="set-table" id="first-table">
+                        <thead>
+                            <tr>
+                                <th>Non-Terminal</th>
+                                <th>FIRST( )</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="sub-label">FOLLOW Sets</div>
+                    <table class="set-table" id="follow-table">
+                        <thead>
+                            <tr>
+                                <th>Non-Terminal</th>
+                                <th>FOLLOW( )</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- LL(1) TABLE -->
+        <section class="card hidden" id="section-ll1">
+            <div class="card-label">04 — LL(1)</div>
+            <h2 class="card-title">LL(1) Parsing Table</h2>
+            <div id="ll1-conflicts-banner" class="conflict-banner hidden"></div>
+            <div class="table-scroll">
+                <table class="parse-table" id="ll1-table">
+                    <thead>
+                        <tr id="ll1-table-head"></tr>
+                    </thead>
+                    <tbody id="ll1-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- LR(1) TABLE -->
+        <section class="card hidden" id="section-lr1">
+            <div class="card-label">05 — LR(1)</div>
+            <h2 class="card-title">LR(1) ACTION / GOTO Table</h2>
+            <div id="lr1-conflicts-banner" class="conflict-banner hidden"></div>
+            <div class="lr1-meta" id="lr1-meta"></div>
+            <div class="table-scroll">
+                <table class="parse-table" id="lr1-table">
+                    <thead>
+                        <tr id="lr1-table-head"></tr>
+                    </thead>
+                    <tbody id="lr1-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SIMULATE -->
+        <section class="card hidden" id="section-simulate">
+            <div class="card-label">06 — SIMULATE</div>
+            <h2 class="card-title">Parse Simulation</h2>
+            <p class="card-desc">Run your input string through the parser step by step.</p>
+
+            <div class="sim-controls">
+                <div class="toggle-group">
+                    <button class="toggle-btn active" id="toggle-ll1">LL(1)</button>
+                    <button class="toggle-btn" id="toggle-lr1">LR(1)</button>
+                </div>
+                <button class="btn-primary" id="btn-simulate">
+                    <span>Simulate</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M5 3l8 5-8 5V3z" fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sim-result hidden" id="sim-result">
+                <div class="result-badge" id="result-badge"></div>
+                <div class="table-scroll">
+                    <table class="parse-table sim-table" id="sim-table">
+                        <thead>
+                            <tr id="sim-table-head"></tr>
+                        </thead>
+                        <tbody id="sim-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ── LOADER ──────────────────────────────────────────── -->
+    <div class="loader-overlay hidden" id="loader">
+        <div class="loader-inner">
+            <div class="loader-spinner"></div>
+            <div class="loader-text" id="loader-text">Generating grammar...</div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>

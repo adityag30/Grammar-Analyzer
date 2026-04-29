@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "axe/forms": [
+      "default",
+      {
+        "label": "off"
+      }
+    ],
+    "no-inline-styles": "off",
+    "compat-api/css": "warning",
+    "meta-viewport": "error",
+    "html-checker": "off",
+    "css-prefix-order": "warning",
+    "disown-opener": "warning",
+    "content-type": "error"
+  }
+}
